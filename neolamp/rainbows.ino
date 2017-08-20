@@ -14,6 +14,5 @@ void rainbow(int startColorIndex){
       pixels.setPixelColor(i, wheel(((i * 256 / NUMPIXELS) + startColorIndex)& 255));
     }
     pixels.show();
-    delay(10);
 }
 

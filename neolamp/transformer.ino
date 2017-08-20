@@ -50,13 +50,52 @@ void transform(int stepDelay) {
   Serial.println("Begin transformation");
   boolean migrating = true;
   while (migrating) {
-    migrating = false;
-    for(int i=0; i< NUMPIXELS; i++) {
-      migrating = stepToColor(i, getTargetColor(i)) || migrating;
-    }
+    migrating = migrate();
     pixels.show();   
     delay(stepDelay);
   }
+}
+
+/*
+ * Makes 'steps' steps to the target Color array.
+ */
+boolean migrate(){
+  boolean migrating = false;
+  for(int i=0; i< NUMPIXELS; i++) {
+      migrating = stepToColor(i, getTargetColor(i)) || migrating;
+  }
+  return migrating;
+}
+
+/*
+ * Shows the target array at once
+ */
+ void showTargetColors(){
+  for(int i=0; i< NUMPIXELS; i++) {
+      pixels.setPixelColor(i, getTargetColor(i));
+  }
+}
+
+/*
+ * Can be used to "DIM" a pixel while keeping the same color.
+ */
+uint32_t brightness(byte brightness, uint32_t color) {
+  byte red   = (color & 0xFF000000) >> 24;
+  byte green = (color & 0x00FF0000) >> 16;
+  byte blue  = (color & 0x0000FF00) >> 8;
+  byte white = (color & 0x000000FF) >> 0;
+
+  red   = int(((float) brightness / 255) * red) & 0xFF;
+  green = int(((float) brightness / 255) * green) & 0xFF;
+  blue  = int(((float) brightness / 255) * blue) & 0xFF;
+  white = int(((float) brightness / 255) * white) & 0xFF;
+
+  uint32_t newColor = red;
+  newColor = (newColor << 8) | green;
+  newColor = (newColor << 8) | blue;
+  newColor = (newColor << 8) | white;
+  
+  return newColor;  
 }
 
 boolean stepToColor(int pixelIndex, uint32_t targetColor) {
